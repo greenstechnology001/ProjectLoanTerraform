@@ -1,0 +1,42 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: 'latest'
+  
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'LoanAzureConnection'
+    backendAzureRmResourceGroupName: 'terraformsa20241214'
+    backendAzureRmStorageAccountName: 'terraformsa20241214'
+    backendAzureRmContainerName: 'terraformsa20241214'
+    backendAzureRmKey: 'terraform.tfstate'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'LoanAzureConnection'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    environmentServiceNameAzureRM: 'LoanAzureConnection'
